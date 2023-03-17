@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/gray-matrix-interview-assignment/static/css/main.2c1fc5ef.css",
+    "main.js": "/gray-matrix-interview-assignment/static/js/main.fc53639f.js",
+    "static/js/787.6107e797.chunk.js": "/gray-matrix-interview-assignment/static/js/787.6107e797.chunk.js",
+    "index.html": "/gray-matrix-interview-assignment/index.html",
+    "main.2c1fc5ef.css.map": "/gray-matrix-interview-assignment/static/css/main.2c1fc5ef.css.map",
+    "main.fc53639f.js.map": "/gray-matrix-interview-assignment/static/js/main.fc53639f.js.map",
+    "787.6107e797.chunk.js.map": "/gray-matrix-interview-assignment/static/js/787.6107e797.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2c1fc5ef.css",
+    "static/js/main.fc53639f.js"
+  ]
+}
