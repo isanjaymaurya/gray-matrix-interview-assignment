@@ -203,20 +203,20 @@ function App() {
     }
     }
 
-    // await axiosInstance.post(url, req).then((res) => {
-    //   console.log(res)
-    //   if(res.status === 200){
-    //       Swal.fire(
-    //         'Form Submited',
-    //         'success'
-    //       )
-    //   } else {
-    //     Swal.fire(
-    //       'Form Submition failed',
-    //       'error'
-    //     )
-    //   }
-    // })
+    await axiosInstance.post(url, req).then((res) => {
+      console.log(res)
+      if(res.status === 200){
+          Swal.fire(
+            'Form Submited',
+            'success'
+          )
+      } else {
+        Swal.fire(
+          'Form Submition failed',
+          'error'
+        )
+      }
+    })
   }
 
   const handleImgChange = (e) => {
@@ -234,8 +234,8 @@ function App() {
         </header>
 
         <main>
-          <div className='flex grid-cols-2 gap-4 mx-4'>
-            <div className='w-4/5'>
+          <div className='grid md:flex grid-cols-1 md:grid-cols-2 md:gap-4 mx-4'>
+            <div className='md:w-4/5'>
               <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -244,7 +244,7 @@ function App() {
                 {({ values, errors, touched, setFieldValue }) => {
                   return (
                     <Form noValidate>
-                      <div className='my-4 grid grid-cols-2 gap-4 '>
+                      <div className='my-4 grid-cols-1 md:grid-cols-2 gap-4 '>
                         <div>
                           <label className='text-sm font-semibold' htmlFor='title'>
                             Title Question <span className='text-red-500'>*</span>
@@ -312,7 +312,7 @@ function App() {
                       
                       <div className='my-4'>
                         <div className='bg-white border border-slate-300 rounded'>
-                          <div className='grid grid-cols-2 md:grid-rows-1 m-4 gap-4'>
+                          <div className='grid grid-cols-1 md:grid-cols-2 m-4 gap-4'>
                             <div>
                               <h4 className='font-medium'>Question</h4>
                               <hr className='my-2' />
@@ -552,8 +552,8 @@ function App() {
                 }}
               </Formik>
             </div>
-            <div className='w-1/5 my-4'>
-              <div className='rounded-lg border-slate-300 shadow-md sticky' style={{ top: 72 }}>
+            <div className='md:w-1/5 my-4'>
+              <div className='rounded-lg border-slate-300 shadow-md md:sticky md:top[72px['>
                 <div className='bg-[#256cdc] p-4 flex items-center gap-3 rounded-t-xl '>
                   <Avatar>
                     <SmartToyOutlinedIcon />
