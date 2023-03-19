@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/gray-matrix-interview-assignment/static/css/main.e91a9a94.css",
-    "main.js": "/gray-matrix-interview-assignment/static/js/main.eb517de1.js",
+    "main.css": "/gray-matrix-interview-assignment/static/css/main.ca5c4d85.css",
+    "main.js": "/gray-matrix-interview-assignment/static/js/main.7a1642fd.js",
     "static/js/787.6107e797.chunk.js": "/gray-matrix-interview-assignment/static/js/787.6107e797.chunk.js",
     "index.html": "/gray-matrix-interview-assignment/index.html",
-    "main.e91a9a94.css.map": "/gray-matrix-interview-assignment/static/css/main.e91a9a94.css.map",
-    "main.eb517de1.js.map": "/gray-matrix-interview-assignment/static/js/main.eb517de1.js.map",
+    "main.ca5c4d85.css.map": "/gray-matrix-interview-assignment/static/css/main.ca5c4d85.css.map",
+    "main.7a1642fd.js.map": "/gray-matrix-interview-assignment/static/js/main.7a1642fd.js.map",
     "787.6107e797.chunk.js.map": "/gray-matrix-interview-assignment/static/js/787.6107e797.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e91a9a94.css",
-    "static/js/main.eb517de1.js"
+    "static/css/main.ca5c4d85.css",
+    "static/js/main.7a1642fd.js"
   ]
 }
