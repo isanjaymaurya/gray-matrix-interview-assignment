@@ -23,6 +23,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
+import isEmpty from 'lodash/isEmpty'
 
 const theme = createTheme({
   palette: {
@@ -59,6 +60,8 @@ const TOPICS = [
   "JavaScript animations",
   "JavaScript data structures and algorithms"
 ]
+
+const FILE_SIZE = 2097152 //2 mb
 
 const RESPONSE_BUTTONS = [
   {
@@ -112,16 +115,7 @@ const ImgInput = ({ name, onChange, title, value }) => {
 
 function App() {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [qna, setQna] = React.useState([
-    {
-      title: "question 1",
-      type: "userMsg"
-    },
-    {
-      title: "hello ",
-      type: "botReply"
-    },
-  ])
+  const [qna, setQna] = React.useState([])
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -140,26 +134,20 @@ function App() {
       "hello",
       "hello",
     ],
-    response: [
-      {
-        responseType: 'text',
-        responseContent: 'hello'
-      }
-    ],
+    responseType: 'text',
+    responseContent: 'hello'
   }
 
   const validationSchema = Yup.object().shape({
       title: Yup.string().trim().required("This field is required"),
-      topics: Yup.array().of(Yup.string().required("This field is required")),
+      topics: Yup.array().of(
+        Yup.string().trim()
+      ),
       question: Yup.array().of(
         Yup.string().required("Please enter question synonym")
       ).min(3, 'Minimum 5 question required'),
-      response: Yup.array().of(
-        Yup.object().shape({
-          responseContent: Yup.mixed().required('Required'),
-          responseType: Yup.string(), // these constraints take precedence
-        })
-      ).min(1, 'Minimum 1 response required')
+      responseType: Yup.string(),
+      responseContent: Yup.string().trim().required('Please enter reponse ')
     })
   
   const handleOnReset = () => {
@@ -190,7 +178,7 @@ function App() {
                         {
                             "text_input": [
                                 {
-                                    "text": "Test Response",
+                                    "text": formData.responseContent,
                                     "type": "text"
                                 }
                             ],
@@ -206,6 +194,13 @@ function App() {
     await axiosInstance.post(url, req).then((res) => {
       console.log(res)
       if(res.status === 200){
+        console.log("qna", qna)
+        const newQna = [
+          ...qna,
+          formData
+        ]
+        console.log("newQna", newQna)
+        setQna(newQna)
           Swal.fire(
             'Form Submited',
             'success'
@@ -217,10 +212,6 @@ function App() {
         )
       }
     })
-  }
-
-  const handleImgChange = (e) => {
-
   }
 
   return (
@@ -244,7 +235,7 @@ function App() {
                 {({ values, errors, touched, setFieldValue }) => {
                   return (
                     <Form noValidate>
-                      <div className='my-4 grid-cols-1 md:grid-cols-2 gap-4 '>
+                      <div className='my-4 grid grid-cols-1 md:grid-cols-2 md:gap-4 '>
                         <div>
                           <label className='text-sm font-semibold' htmlFor='title'>
                             Title Question <span className='text-red-500'>*</span>
@@ -373,170 +364,142 @@ function App() {
                               <h4 className='font-medium'>Response</h4>
                               <hr className='my-2' />
                               <div className='border border-slate-300 px-3 rounded'>
-                                <FieldArray
-                                  name="response"
-                                  render={({ insert, remove, push, replace }) => (
+                                <div className='bg-[#d1e4fe] pt-2 pb-4 px-4 rounded-md my-3'>
+                                  <div className='my-1'>
+                                    <div className='font-semibold'>{values.responseType === "text" && 'Bots Message'}</div>
+                                    {/* {idx > 0 &&
+                                    <IconButton onClick={() => remove(idx)} color="default" size="small">
+                                      <DeleteIcon fontSize='small' />
+                                    </IconButton>
+                                    } */}
+                                  </div>
+                                  {values.responseType === "button" ?
                                     <div>
-                                      {values['response'] && values['response'].length > 0 ? (
-                                        <>
-                                          <div>
-                                            {values.response.map((res, idx) =>
-                                              <div key={idx}>
-                                                <div className='bg-[#d1e4fe] pt-2 pb-4 px-4 rounded-md my-3'>
-                                                  <div className='flex justify-between items-center my-1'>
-                                                    <div className='font-semibold'>{values.response[idx].responseType === "text" && 'Bots Message'}</div>
-                                                    {idx > 0 &&
-                                                    <IconButton onClick={() => remove(idx)} color="default" size="small">
-                                                      <DeleteIcon fontSize='small' />
-                                                    </IconButton>
-                                                    }
-                                                  </div>
-                                                  {values.response[idx].responseType === "text" ?
-                                                    <div>
-                                                      <Field
-                                                        name={`response[${idx}].responseContent`}
-                                                        placeholder=''
-                                                        as={TextField}
-                                                        variant='outlined'
-                                                        type='text'
-                                                        fullWidth
-                                                        // size="small"
-                                                        margin="none"
-                                                        multiline
-                                                        rows={2}
-                                                        className="bg-white"
-                                                        // required
-                                                        // error={Boolean(touched.question[idx] && errors.question[idx])}
-                                                        // helperText={touched.question[idx] && errors.question[idx]}
-                                                      />
-                                                    </div> : null
-                                                  }
-                                                  {values.response[idx].responseType === "file" ?
-                                                    <div>
-                                                      <Field
-                                                        id={`response[${idx}].responseContent`}
-                                                        name={`response[${idx}].responseContent`}
-                                                        component={ImgInput}
-                                                        title='Upload File'
-                                                        value={values.response[idx].responseContent}
-                                                        onChange={(e) => {
-                                                          e.preventDefault()
-                                                          const reader = new FileReader()
-                                                          const file = e.target.files[0]
-                                                      
-                                                          console.log(file)
-                                                          if (file) {
-                                                            if (IMG_SUPPORTED_FORMATES.includes(file.type)) {
-                                                              // reader.onloadend = () => dispatch(setIsBackdropLoading(false))
-                                                              reader.readAsDataURL(file)
-                                                              reader.onload = () => {
-                                                                console.log(reader.result)
-                                                                setFieldValue(`response[${idx}].responseContent`, e.currentTarget.files[0]);
-                                                                // setBlobImg(reader.result)
-                                                              }
-                                                            }
-                                                            // props.setFieldValue(field.name, file)
-                                                          }
-                                                        }}                                    
-                                                        // disabled={appState.isLoading}
-                                                        // error={Boolean(errors.attachment)}
-                                                        // helperText={touched.attachment && errors.attachment}
-                                                      />
-                                                    </div> : null
-                                                  }
-                                                  {values.response[idx].responseType === "button" ?
-                                                    <div>
-                                                      <Button variant='outlined' className='!rounded-full' onClick={handleClick} ><AddOutlinedIcon /></Button>
-                                                      <Menu
-                                                        anchorEl={anchorEl}
-                                                        id="account-menu"
-                                                        open={open}
-                                                        onClose={handleClose}
-                                                        onClick={() => {
-                                                          handleClose()
-                                                        }}
-                                                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                                                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                                                      >
-                                                        <div>
-                                                          <div className='text-sm font-semibold pb-1 px-4'>
-                                                            ADD Button
-                                                          </div>
-                                                          <Divider />
-                                                          {RESPONSE_BUTTONS.map((btn, idx) =>
-                                                            <div
-                                                              key={idx}
-                                                              className="hover:bg-slate-50 cursor-pointer"
-                                                              onClick={() => {
-                                                                replace(idx, {
-                                                                  responseType: 'button',
-                                                                  responseContent: btn.subTitle
-                                                                })
-                                                              }}
-                                                            >
-                                                              <div className="p-2 px-4">
-                                                                <div className='text-sm font-medium'>{btn.title}</div>
-                                                                <div className='text-xs font-normal'>{btn.subTitle}</div>
-                                                              </div>
-                                                              {idx !== RESPONSE_BUTTONS.length - 1 && <Divider />}
-                                                            </div>
-                                                          )}
-                                                        </div>
-                                                      </Menu>
-                                                    </div> : null
-                                                  }
-                                                  <ErrorMessage
-                                                    name={`response.${idx}.responseType`}
-                                                    component="div"
-                                                    className="field-error"
-                                                  />
-                                                </div>
-                                              </div>
-                                            )}
+                                      <Button variant='outlined' className='!rounded-full !capitalize' onClick={handleClick}><AddOutlinedIcon fontSize='small' /> {values.responseContent}</Button>
+                                      <Menu
+                                        anchorEl={anchorEl}
+                                        id="account-menu"
+                                        open={open}
+                                        onClose={handleClose}
+                                        onClick={handleClose}
+                                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                                      >
+                                        <div>
+                                          <div className='text-sm font-semibold pb-1 px-4'>
+                                            ADD Button
                                           </div>
-                                        </>
-                                      ) : null}
-                                      <div className='flex gap-2 my-3'>
-                                        <Button
-                                          variant='outlined'
-                                          type="button"
-                                          startIcon={<AddOutlinedIcon fontSize='small' />}
-                                          className="!capitalize"
-                                          onClick={() => push({
-                                            responseType: 'text',
-                                            responseContent: ''
-                                          })}
-                                        >
-                                          Text
-                                        </Button>
-                                        <Button
-                                          variant='outlined'
-                                          type="button"
-                                          startIcon={<AddOutlinedIcon fontSize='small' />}
-                                          className="!capitalize"
-                                          onClick={() => push({
-                                            responseType: 'button',
-                                            responseContent: ''
-                                          })}
-                                        >
-                                          Buttons
-                                        </Button>
-                                        <Button
-                                          variant='outlined'
-                                          type="button"
-                                          startIcon={<AddOutlinedIcon fontSize='small' />}
-                                          className="!capitalize"
-                                          onClick={() => push({
-                                            responseType: 'file',
-                                            responseContent: ''
-                                          })}
-                                        >
-                                          Files / Media
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  )}
-                                />
+                                          <Divider />
+                                          {RESPONSE_BUTTONS.map((btn, idx) =>
+                                            <div
+                                              key={idx}
+                                              className="hover:bg-slate-50 cursor-pointer"
+                                              onClick={() => setFieldValue('responseContent', btn.subTitle)}                                              
+                                            >
+                                              <div className="p-2 px-4">
+                                                <div className='text-sm font-medium'>{btn.title}</div>
+                                                <div className='text-xs font-normal'>{btn.subTitle}</div>
+                                              </div>
+                                              {idx !== RESPONSE_BUTTONS.length - 1 && <Divider />}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </Menu>
+                                    </div> : null
+                                  }
+                                  {values.responseType === "text" || values.responseType === "button" ?
+                                    <Field
+                                      name={`responseContent`}
+                                      placeholder=''
+                                      as={TextField}
+                                      variant='outlined'
+                                      type='text'
+                                      fullWidth
+                                      // size="small"
+                                      margin="none"
+                                      multiline
+                                      rows={2}
+                                      className={`bg-white`}
+                                      sx={{ display: values.responseType === "button" ? 'none' : 'block' }}
+                                      // required
+                                      error={Boolean(touched.responseContent && errors.responseContent)}
+                                    />: null
+                                  }
+                                  {values.responseType === "file" ?
+                                    <div>
+                                      <Field
+                                        id={`responseContent`}
+                                        name={`responseContent`}
+                                        component={ImgInput}
+                                        title='Upload File'
+                                        // value={values.responseContent}
+                                        onChange={(e) => {
+                                          e.preventDefault()
+                                          const reader = new FileReader()
+                                          const file = e.target.files[0]
+                                      
+                                          console.log(file)
+                                          if (file) {
+                                            if (IMG_SUPPORTED_FORMATES.includes(file.type)) {
+                                              // reader.onloadend = () => dispatch(setIsBackdropLoading(false))
+                                              reader.readAsDataURL(file)
+                                              reader.onload = () => {
+                                                console.log(reader.result)
+                                                setFieldValue(`responseContent`, e.currentTarget.files[0]);
+                                                // setBlobImg(reader.result)
+                                              }
+                                            }
+                                            // props.setFieldValue(field.name, file)
+                                          }
+                                        }}                                    
+                                        // disabled={appState.isLoading}
+                                        error={Boolean(errors.responseContent)}
+                                      />
+                                    </div> : null
+                                  }
+                                  {touched.responseContent && errors.responseContent ?
+                                    <div className='text-red-500 text-sm mt-2'>
+                                      <ErrorMessage name="responseContent" /> {values.responseType === 'text' ? 'message' : values.responseType}
+                                    </div> : null}
+                                </div>
+                                <div className='flex gap-2 my-3'>
+                                  <Button
+                                    variant='outlined'
+                                    type="button"
+                                    startIcon={<AddOutlinedIcon fontSize='small' />}
+                                    className="!capitalize"
+                                    onClick={() => {
+                                      setFieldValue('responseType', 'text')
+                                      setFieldValue('responseContent', '')
+                                    }}
+                                  >
+                                    Text
+                                  </Button>
+                                  <Button
+                                    variant='outlined'
+                                    type="button"
+                                    startIcon={<AddOutlinedIcon fontSize='small' />}
+                                    className="!capitalize"
+                                    onClick={() => {
+                                      setFieldValue('responseType', 'button')
+                                      setFieldValue('responseContent', '')
+                                    }}
+                                  >
+                                    Buttons
+                                  </Button>
+                                  <Button
+                                    variant='outlined'
+                                    type="button"
+                                    startIcon={<AddOutlinedIcon fontSize='small' />}
+                                    className="!capitalize"
+                                    onClick={() => {
+                                      setFieldValue('responseType', 'file')
+                                      setFieldValue('responseContent', '')
+                                    }}
+                                  >
+                                    Files / Media
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -553,7 +516,7 @@ function App() {
               </Formik>
             </div>
             <div className='md:w-1/5 my-4'>
-              <div className='rounded-lg border-slate-300 shadow-md md:sticky md:top[72px['>
+              <div className='rounded-lg border-slate-300 shadow-md md:sticky md:top-[72px]'>
                 <div className='bg-[#256cdc] p-4 flex items-center gap-3 rounded-t-xl '>
                   <Avatar>
                     <SmartToyOutlinedIcon />
@@ -562,16 +525,27 @@ function App() {
                     QNA
                   </span>
                 </div>
-                <div className='bg-white p-4 relative'>
-                  <div style={{ minHeight: 200 }}>
-                    {qna.map((msg, idx) => (
-                      <div key={idx} className={`mb-3 ${msg.type === 'userMsg' ? 'text-right' : ''}`}>
-                        <div className={`w-5/6 text-sm px-2 py-1 rounded-lg ${msg.type === 'userMsg' ? 'bg-[#256cdc] text-white rounded-br-none ml-auto' : 'bg-gray-200 rounded-bl-none'}`}>
-                          {msg.title}
+                <div className='bg-white relative'>
+                  <div style={{ height: 220, overflowY: "scroll", overflowX: "hidden" }} className="p-4">
+                    {isEmpty(qna) ? <div className='text-sm text-center'>Please Add Q&N</div> :
+                      qna.map((msg, idx) => (
+                        <div key={idx}>
+                          <div className='mb-3'>
+                            <div className={`w-5/6 text-sm px-3 py-1 rounded-lg bg-[#256cdc] text-white rounded-br-none ml-auto`}>
+                              {msg.title}
+                            </div>
+                            <div className='text-[10px] my-1 text-right'>Guest User ask</div>
+                          </div>
+
+                          <div className={`mb-3`}>
+                            <div className={`w-5/6 text-sm px-3 py-1 rounded-lg bg-gray-200 rounded-bl-none`}>
+                              {['text', 'button'].includes(msg.responseType) ? msg.responseContent : ''}
+                            </div>
+                            <div className='text-[10px] my-1'>CSD bot reply</div>
+                          </div>
                         </div>
-                        <div className='text-[10px] my-1'>{msg.type === 'userMsg' ? 'Guest User ask' : 'CSD bot reply' }</div>
-                      </div>
-                    ))}
+                      ))
+                    }
                   </div>
                   <hr className='border-dashed border-slate-600 my-2' />
                   <div className='py-2 pb-4 mx-2 text-center text-xs font-semibold'>
