@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/gray-matrix-interview-assignment/static/css/main.ca5c4d85.css",
-    "main.js": "/gray-matrix-interview-assignment/static/js/main.6a9647c6.js",
+    "main.js": "/gray-matrix-interview-assignment/static/js/main.f193aba5.js",
     "static/js/787.6107e797.chunk.js": "/gray-matrix-interview-assignment/static/js/787.6107e797.chunk.js",
     "index.html": "/gray-matrix-interview-assignment/index.html",
     "main.ca5c4d85.css.map": "/gray-matrix-interview-assignment/static/css/main.ca5c4d85.css.map",
-    "main.6a9647c6.js.map": "/gray-matrix-interview-assignment/static/js/main.6a9647c6.js.map",
+    "main.f193aba5.js.map": "/gray-matrix-interview-assignment/static/js/main.f193aba5.js.map",
     "787.6107e797.chunk.js.map": "/gray-matrix-interview-assignment/static/js/787.6107e797.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.ca5c4d85.css",
-    "static/js/main.6a9647c6.js"
+    "static/js/main.f193aba5.js"
   ]
 }
