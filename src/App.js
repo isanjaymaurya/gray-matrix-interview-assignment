@@ -8,22 +8,22 @@ import {
   FormControl,
   FormHelperText,
   IconButton,
-  InputAdornment,
   MenuItem,
   TextField,
   Menu,
   Divider,
 } from '@mui/material'
-import ListItemIcon from '@mui/material/ListItemIcon';
 import { Field, Form, Formik, FieldArray, ErrorMessage } from 'formik';
 import * as Yup from "yup";
 import axios from 'axios'
 import Swal from 'sweetalert2'
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteIcon from '@mui/icons-material/Delete';
 import isEmpty from 'lodash/isEmpty'
+import { useLocation } from 'react-router';
+import {GA4React} from 'ga-4-react'
 
 const theme = createTheme({
   palette: {
@@ -116,6 +116,7 @@ const ImgInput = ({ name, onChange, title, value }) => {
 function App() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [qna, setQna] = React.useState([])
+  const {pathname, search} = useLocation()
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -213,6 +214,29 @@ function App() {
       }
     })
   }
+
+  const ga4react = new GA4React(process.env.GA_ID)
+
+  const analytics = React.useCallback(() => {
+    trackPathForAnalytics({
+      path: pathname,
+      search: search,
+      title: pathname.split("/")[1] 
+    })
+  })
+
+  const trackPathForAnalytics = (data) => {
+    const {path, search, title} = data
+    ga4react
+      .then((ga) => {
+        ga.pageview(path, search, title)
+      })
+      .catch((err) => console.error("Analytics failed >>>", err))
+  }
+
+  React.useEffect(() => {
+    analytics()
+  }, [analytics])
 
   return (
     <ThemeProvider theme={theme}>
@@ -539,7 +563,7 @@ function App() {
 
                           <div className={`mb-3`}>
                             <div className={`w-5/6 text-sm px-3 py-1 rounded-lg bg-gray-200 rounded-bl-none`}>
-                              {['text', 'button'].includes(msg.responseType) ? msg.responseContent : ''}
+                              {['text', 'button'].includes(msg.responseType) ? msg.responseContent : <img src={msg.responseContent} />}
                             </div>
                             <div className='text-[10px] my-1'>CSD bot reply</div>
                           </div>
